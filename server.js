@@ -7,7 +7,7 @@ const port = 3000
 const gm = require('gm')
 
 app.use(express.static('public'))
-app.use(express.static('uploads'))
+app.use(express.static('transformed'))
 app.use(morgan('dev'))
 
 app.set('views', './views')
@@ -27,15 +27,25 @@ app.post('/images', upload.single('pic'), function (req, res) {
 })
 
 app.get('/images/:id', function (req, res) {
-  res.render('images', { src: `../${req.params.id}`, title: `image ${req.params.id}` })
+  res.render('images', {
+    src: `../${req.params.id}`,
+    title: `image ${req.params.id}`
+  })
 })
 
 function transformImage(pathToImage, cb) {
+  const fileName = getFileName(pathToImage)
+
   gm(pathToImage)
     .rotate('green', 20)
     .blur(7, 3)
     .edge(3)
-    .write(`${pathToImage}-transformed`, cb)
+    .write(`transformed/${fileName}`, cb)
+}
+
+function getFileName(path) {
+  const n = path.lastIndexOf('/')
+  return path.substring(n + 1)
 }
 
 
