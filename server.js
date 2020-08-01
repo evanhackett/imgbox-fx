@@ -7,7 +7,11 @@ const port = 3000
 const gm = require('gm')
 
 app.use(express.static('public'))
+app.use(express.static('uploads'))
 app.use(morgan('dev'))
+
+app.set('views', './views')
+app.set('view engine', 'pug')
 
 app.post('/images', upload.single('pic'), function (req, res) {
   console.log('req.file:', req.file)
@@ -20,7 +24,10 @@ app.post('/images', upload.single('pic'), function (req, res) {
 
     return res.send('POST to /images success!')
   })
+})
 
+app.get('/images/:id', function (req, res) {
+  res.render('images', { src: `../${req.params.id}`, title: `image ${req.params.id}` })
 })
 
 function transformImage(pathToImage, cb) {
