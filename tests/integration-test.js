@@ -88,3 +88,42 @@ test('POST /images should respond with 400 if image is over 10MB', t => {
     })
 })
 
+test('POST /images should respond with 400 if title field is invalid', t => {
+  t.plan(3)
+
+  // no title field at all
+  request(app)
+    .post('/images')
+    .attach('pic', 'tests/fixtures/fractal.png')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('Title field should be between 1 and 100 characters'), true)
+    })
+
+  // title is empty string
+  request(app)
+    .post('/images')
+    .field('title', '')
+    .attach('pic', 'tests/fixtures/fractal.png')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('Title field should be between 1 and 100 characters'), true)
+    })
+
+  // title is greater than 100 chars
+  const title = Array.from({length: 102}).join('a')
+  request(app)
+    .post('/images')
+    .field('title', title)
+    .attach('pic', 'tests/fixtures/fractal.png')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('Title field should be between 1 and 100 characters'), true)
+    })
+
+
+})
+

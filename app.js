@@ -13,6 +13,9 @@ module.exports = function (cfg) {
     dest: cfg.uploadDir,
     limits: {
       fileSize: 10485760, // 10MB
+      fieldSize: 100,
+      fieldNameSize: 100,
+      fields: 1
     }
   })
 
@@ -29,6 +32,10 @@ module.exports = function (cfg) {
   }
 
   app.post('/images', upload.single('pic'), (req, res) => {
+    if (!req.body.title || req.body.title.length < 1) {
+      return res.status(400).send('Title field should be between 1 and 100 characters.')
+    }
+
     const uploadedPath = req.file.path
     const fileName = getFileName(uploadedPath)
 
@@ -90,6 +97,11 @@ module.exports = function (cfg) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).send('File is too large. Image file should be less than 10MB.')
       }
+      if (err.code === 'LIMIT_FIELD_VALUE') {
+        return res.status(400).send('Title field should be between 1 and 100 characters.')
+      }
+      
+      console.log(err)
     }
 
     console.error(err.stack)
