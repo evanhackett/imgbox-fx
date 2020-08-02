@@ -8,7 +8,6 @@ module.exports = function (cfg) {
   const db = cfg.db
   const getFileName = require('./utils/getFileName')
 
-
   const upload = multer({
     dest: cfg.uploadDir,
     limits: {
@@ -31,6 +30,11 @@ module.exports = function (cfg) {
     res.status(500).send('ERROR')
   }
 
+  const handleGmError = (err, res) => {
+    res.status(400).send('Error attempting to transform image. The chosen file must be a valid image format')
+  }
+
+
   app.post('/images', upload.single('pic'), (req, res) => {
     if (!req.body.title || req.body.title.length < 1) {
       return res.status(400).send('Title field should be between 1 and 100 characters.')
@@ -40,11 +44,15 @@ module.exports = function (cfg) {
       return res.status(400).send('Image file must be selected')
     }
 
+    if (!req.file.mimetype.includes('image')) {
+      return res.status(400).send('The chosen file must be a valid image format')
+    }
+
     const uploadedPath = req.file.path
     const fileName = getFileName(uploadedPath)
 
     transformImage(uploadedPath, fileName, async (err) => {
-      if (err) return handleError(err, res)
+      if (err) return handleGmError(err, res)
 
       const doc = {
         fileName: fileName,

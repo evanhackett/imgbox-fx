@@ -137,3 +137,16 @@ test('POST /images should respond with 400 if no image is attached', t => {
     })
 })
 
+test('POST /images should respond with 400 if file is not an image', t => {
+  request(app)
+    .post('/images')
+    .field('title', 'test')
+    .attach('pic', 'tests/fixtures/not-an-image.txt')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('The chosen file must be a valid image'), true)
+      t.end()
+    })
+})
+
