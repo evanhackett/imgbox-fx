@@ -5,8 +5,8 @@ const multer  = require('multer')
 const upload = multer({ dest: 'uploads/' })
 const port = 3000
 const gm = require('gm')
-
-const fs = require('fs');
+const fs = require('fs')
+const db = require('rocket-store')
 
 // make sure the transformed dir exists before trying to write to it.
 // gm throws error when writing to a folder that doesn't exist.
@@ -16,6 +16,12 @@ if (!fs.existsSync(dir)){
     fs.mkdirSync(dir)
 }
 
+const connectDb = async () => {
+  await db.options({ data_storage_area : './db' })
+  console.log('Connected to database.')
+}
+
+
 app.use(express.static('public'))
 app.use(express.static('transformed'))
 app.use(morgan('dev'))
@@ -23,39 +29,59 @@ app.use(morgan('dev'))
 app.set('views', './views')
 app.set('view engine', 'pug')
 
+function handleError(err, res) {
+  console.log('got an error:', err)
+  res.status(500).send('ERROR')
+}
+
 app.post('/images', upload.single('pic'), function (req, res) {
   console.log('req.file:', req.file)
+  console.log('req.body:', req.body)
 
   const uploadedPath = req.file.path
   const fileName = getFileName(uploadedPath)
 
-  transformImage(uploadedPath, fileName, function (err) {
-    if (err) { 
-      console.log(err)
-      return res.send('ERROR')
+  transformImage(uploadedPath, fileName, async function (err) {
+    if (err) return handleError(err, res)
+
+    const doc = {
+      fileName: fileName,
+      created: new Date(),
+      title: req.body.title
     }
 
+    const result = await db.post('images', fileName, doc)
+      
     return res.redirect(`/images/${fileName}`)
   })
 })
 
-app.get('/images/:id', function (req, res) {
+app.get('/images/:id', async (req, res) => {
+
+  const result = await db.get('images', req.params.id) 
+  // todo: hand file not found.
+  const doc = result.result[0]
+  
+  console.log('doc:', doc)
+
   res.render('image', {
     src: `../${req.params.id}`,
-    title: `image ${req.params.id}`
+    title: doc.title,
+    created: doc.created
   })
 })
 
-app.get('/images', function (req, res) {
-  fs.readdir('./transformed', (err, files) => {
-    if (err) {
-      console.log(err)
-      return res.status(500).send('An error occurred while attempting to get images.')
-    }
+app.get('/images', async (req, res) => {
+  const result = await db.get('images', '*')
+  const docs = result.result
+  console.log('docs:', docs)
 
-    res.render('all-images', {
-      images: files.map(file => ({url: `images/${file}`}))
-    })
+  res.render('all-images', {
+    images: docs.map(doc => ({
+      url: `images/${doc.fileName}`,
+      title: doc.title,
+      created: doc.created
+    }))
   })
 })
 
@@ -74,4 +100,8 @@ function getFileName(path) {
 }
 
 
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`))
+app.listen(port, async () => {
+  await connectDb()
+  console.log(`App listening at http://localhost:${port}`)
+})
+
