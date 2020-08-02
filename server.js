@@ -80,7 +80,7 @@ app.get('/images', async (req, res) => {
     images: docs.map(doc => ({
       url: `images/${doc.fileName}`,
       title: doc.title,
-      created: doc.created
+      created: new Date(doc.created.toString())
     }))
   })
 })

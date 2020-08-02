@@ -5,5 +5,5 @@ html
     a(href='/') home
     h1= 'All Images'
     ul
-      each image in images
-        li: a(href= image.url)= image.title
+      each image in images.sort((a,b) => b.created - a.created)
+        li: a(href= image.url)= `${image.title} - ${image.created.toLocaleString()}`
