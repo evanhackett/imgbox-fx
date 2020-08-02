@@ -11,8 +11,7 @@ const db = require('rocket-store')
 // make sure the transformed dir exists before trying to write to it.
 // gm throws error when writing to a folder that doesn't exist.
 const dir = './transformed'
-
-if (!fs.existsSync(dir)){
+if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir)
 }
 
@@ -21,27 +20,22 @@ const connectDb = async () => {
   console.log('Connected to database.')
 }
 
-
 app.use(express.static('public'))
 app.use(express.static('transformed'))
 app.use(morgan('dev'))
-
 app.set('views', './views')
 app.set('view engine', 'pug')
 
-function handleError(err, res) {
-  console.log('got an error:', err)
+const handleError = (err, res) => {
+  console.error('got an error:', err)
   res.status(500).send('ERROR')
 }
 
-app.post('/images', upload.single('pic'), function (req, res) {
-  console.log('req.file:', req.file)
-  console.log('req.body:', req.body)
-
+app.post('/images', upload.single('pic'), (req, res) => {
   const uploadedPath = req.file.path
   const fileName = getFileName(uploadedPath)
 
-  transformImage(uploadedPath, fileName, async function (err) {
+  transformImage(uploadedPath, fileName, async (err) => {
     if (err) return handleError(err, res)
 
     const doc = {
@@ -57,13 +51,10 @@ app.post('/images', upload.single('pic'), function (req, res) {
 })
 
 app.get('/images/:id', async (req, res) => {
-
   const result = await db.get('images', req.params.id) 
   // todo: hand file not found.
   const doc = result.result[0]
   
-  console.log('doc:', doc)
-
   res.render('image', {
     src: `../${req.params.id}`,
     title: doc.title,
@@ -74,7 +65,6 @@ app.get('/images/:id', async (req, res) => {
 app.get('/images', async (req, res) => {
   const result = await db.get('images', '*')
   const docs = result.result
-  console.log('docs:', docs)
 
   res.render('all-images', {
     images: docs.map(doc => ({
@@ -85,8 +75,7 @@ app.get('/images', async (req, res) => {
   })
 })
 
-function transformImage(pathToImage, fileName, cb) {
-
+const transformImage = (pathToImage, fileName, cb) => {
   gm(pathToImage)
     .rotate('green', 20)
     .blur(7, 3)
@@ -94,7 +83,7 @@ function transformImage(pathToImage, fileName, cb) {
     .write(`transformed/${fileName}`, cb)
 }
 
-function getFileName(path) {
+const getFileName = path => {
   const n = path.lastIndexOf('/')
   return path.substring(n + 1)
 }
