@@ -1,0 +1,9 @@
+html
+  head
+    title='All Images'
+  body
+    a(href='/') home
+    h1= 'All Images'
+    ul
+      each image in images
+        li: a(href= image.url)= image.url

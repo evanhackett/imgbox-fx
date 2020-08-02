@@ -40,9 +40,22 @@ app.post('/images', upload.single('pic'), function (req, res) {
 })
 
 app.get('/images/:id', function (req, res) {
-  res.render('images', {
+  res.render('image', {
     src: `../${req.params.id}`,
     title: `image ${req.params.id}`
+  })
+})
+
+app.get('/images', function (req, res) {
+  fs.readdir('./transformed', (err, files) => {
+    if (err) {
+      console.log(err)
+      return res.status(500).send('An error occurred while attempting to get images.')
+    }
+
+    res.render('all-images', {
+      images: files.map(file => ({url: `images/${file}`}))
+    })
   })
 })
 
