@@ -67,7 +67,7 @@ app.get('/images/:id', async (req, res) => {
   res.render('image', {
     src: `../${req.params.id}`,
     title: doc.title,
-    created: doc.created
+    created: new Date(doc.created.toString())
   })
 })
 
