@@ -6,6 +6,16 @@ const upload = multer({ dest: 'uploads/' })
 const port = 3000
 const gm = require('gm')
 
+const fs = require('fs');
+
+// make sure the transformed dir exists before trying to write to it.
+// gm throws error when writing to a folder that doesn't exist.
+const dir = './transformed'
+
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir)
+}
+
 app.use(express.static('public'))
 app.use(express.static('transformed'))
 app.use(morgan('dev'))
