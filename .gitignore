@@ -2,5 +2,7 @@ node_modules
 uploads
 transformed/*
 !transformed/.gitkeep
+tests/fixtures/transformed/*
+!tests/fixtures/transformed/.gitkeep
 db
 todo.txt

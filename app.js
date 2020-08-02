@@ -7,6 +7,7 @@ module.exports = function (cfg) {
   const gm = require('gm')
   const fs = require('fs')
   const db = cfg.db
+  const getFileName = require('./utils/getFileName')
 
   app.use(express.static('public'))
   app.use(express.static(cfg.transformDir))
@@ -69,11 +70,6 @@ module.exports = function (cfg) {
       .blur(7, 3)
       .edge(3)
       .write(`${cfg.transformDir}/${fileName}`, cb)
-  }
-
-  const getFileName = path => {
-    const n = path.lastIndexOf('/')
-    return path.substring(n + 1)
   }
 
   return app
