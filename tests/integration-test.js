@@ -73,5 +73,18 @@ test('GET /images/<invalid-id> should respond with 404', t => {
       console.log(res.text)
       t.end()
     })
-
 })
+
+test('POST /images should respond with 400 if image is over 10MB', t => {
+  request(app)
+    .post('/images')
+    .field('title', 'this is a big file')
+    .attach('pic', 'tests/fixtures/large-file.jpg')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('Image file should be less than 10MB'), true)
+      t.end()
+    })
+})
+

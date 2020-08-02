@@ -3,17 +3,25 @@ module.exports = function (cfg) {
   const app = express()
   const morgan = require('morgan')
   const multer  = require('multer')
-  const upload = multer({ dest: cfg.uploadDir })
   const gm = require('gm')
   const fs = require('fs')
   const db = cfg.db
   const getFileName = require('./utils/getFileName')
+
+
+  const upload = multer({
+    dest: cfg.uploadDir,
+    limits: {
+      fileSize: 10485760, // 10MB
+    }
+  })
 
   app.use(express.static('public'))
   app.use(express.static(cfg.transformDir))
   app.use(morgan('dev'))
   app.set('views', './views')
   app.set('view engine', 'pug')
+
 
   const handleError = (err, res) => {
     console.error('got an error:', err)
@@ -75,6 +83,19 @@ module.exports = function (cfg) {
       .edge(3)
       .write(`${cfg.transformDir}/${fileName}`, cb)
   }
+
+  // error-handling middleware has to be last, after app.use() and routes calls
+  app.use(function (err, req, res, next) {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).send('File is too large. Image file should be less than 10MB.')
+      }
+    }
+
+    console.error(err.stack)
+    res.status(500).send('Unexpected Error occurred.')
+  })
+
 
   return app
 }
