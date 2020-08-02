@@ -26,13 +26,16 @@ app.set('view engine', 'pug')
 app.post('/images', upload.single('pic'), function (req, res) {
   console.log('req.file:', req.file)
 
-  transformImage(req.file.path, function (err) {
+  const uploadedPath = req.file.path
+  const fileName = getFileName(uploadedPath)
+
+  transformImage(uploadedPath, fileName, function (err) {
     if (err) { 
       console.log(err)
       return res.send('ERROR')
     }
 
-    return res.send('POST to /images success!')
+    return res.redirect(`/images/${fileName}`)
   })
 })
 
@@ -43,8 +46,7 @@ app.get('/images/:id', function (req, res) {
   })
 })
 
-function transformImage(pathToImage, cb) {
-  const fileName = getFileName(pathToImage)
+function transformImage(pathToImage, fileName, cb) {
 
   gm(pathToImage)
     .rotate('green', 20)
