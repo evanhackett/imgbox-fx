@@ -63,3 +63,15 @@ test('GET /images should respond with all-images view', t => {
       t.end()
     })
 })
+
+test('GET /images/<invalid-id> should respond with 404', t => {
+  request(app)
+    .get('/images/this-should-404')
+    .expect(404)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      console.log(res.text)
+      t.end()
+    })
+
+})

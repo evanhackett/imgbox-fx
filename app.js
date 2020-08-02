@@ -41,7 +41,11 @@ module.exports = function (cfg) {
 
   app.get('/images/:id', async (req, res) => {
     const result = await db.get('images', req.params.id) 
-    // todo: hand file not found.
+    
+    if (!result.count) {
+      return res.status(404).send(`image ${req.params.id} not found`)
+    }
+
     const doc = result.result[0]
     
     res.render('image', {
