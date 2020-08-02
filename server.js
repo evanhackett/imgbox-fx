@@ -8,13 +8,6 @@ const gm = require('gm')
 const fs = require('fs')
 const db = require('rocket-store')
 
-// make sure the transformed dir exists before trying to write to it.
-// gm throws error when writing to a folder that doesn't exist.
-const dir = './transformed'
-if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir)
-}
-
 const connectDb = async () => {
   await db.options({ data_storage_area : './db' })
   console.log('Connected to database.')
