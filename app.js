@@ -36,6 +36,10 @@ module.exports = function (cfg) {
       return res.status(400).send('Title field should be between 1 and 100 characters.')
     }
 
+    if (!req.file) {
+      return res.status(400).send('Image file must be selected')
+    }
+
     const uploadedPath = req.file.path
     const fileName = getFileName(uploadedPath)
 

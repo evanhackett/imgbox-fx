@@ -123,7 +123,17 @@ test('POST /images should respond with 400 if title field is invalid', t => {
       if (err) return t.end(err)
       t.equal(res.text.includes('Title field should be between 1 and 100 characters'), true)
     })
+})
 
-
+test('POST /images should respond with 400 if no image is attached', t => {
+  request(app)
+    .post('/images')
+    .field('title', 'test')
+    .expect(400)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equal(res.text.includes('Image file must be selected'), true)
+      t.end()
+    })
 })
 
