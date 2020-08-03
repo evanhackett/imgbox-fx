@@ -24,7 +24,7 @@ module.exports = function (cfg) {
   app.set('views', './views')
   app.set('view engine', 'pug')
 
-  const error400 = (msg, res) => res.status(400).send(msg)
+  const error400 = (msg, res) => res.status(400).render('error', {msg})
 
   app.post('/images', upload.single('pic'), (req, res) => {
     if (!req.body.title || req.body.title.length < 1) return error400('Title field should be between 1 and 100 characters.', res)
