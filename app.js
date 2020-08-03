@@ -7,6 +7,7 @@ module.exports = function (cfg) {
   const fs = require('fs')
   const db = cfg.db
   const getFileName = require('./utils/getFileName')
+  const asyncHandler = require('./utils/asyncHandler')
 
   const upload = multer({
     dest: cfg.uploadDir,
@@ -26,7 +27,7 @@ module.exports = function (cfg) {
 
   const error400 = (msg, res) => res.status(400).render('error', {msg})
 
-  app.post('/images', upload.single('pic'), (req, res) => {
+  app.post('/images', upload.single('pic'), (req, res, next) => {
     if (!req.body.title || req.body.title.length < 1) return error400('Title field should be between 1 and 100 characters.', res)
     if (!req.file) return error400('Image file must be selected', res)
     if (!req.file.mimetype.includes('image')) return error400('The chosen file must be a valid image format', res)
@@ -35,21 +36,26 @@ module.exports = function (cfg) {
     const fileName = getFileName(uploadedPath)
 
     transformImage(uploadedPath, fileName, async (err) => {
-      if (err) return error400('Error attempting to transform image. The chosen file must be a valid image format', res)
+      try {
+        if (err) return error400('Error attempting to transform image. The chosen file must be a valid image format', res)
 
-      const doc = {
-        fileName: fileName,
-        created: new Date(),
-        title: req.body.title
+        const doc = {
+          fileName: fileName,
+          created: new Date(),
+          title: req.body.title
+        }
+
+        const result = await db.post('images', fileName, doc)
+          
+        return res.redirect(`/images/${fileName}`)
+
+      } catch (err) {
+        return next(err)
       }
-
-      const result = await db.post('images', fileName, doc)
-        
-      return res.redirect(`/images/${fileName}`)
     })
   })
 
-  app.get('/images/:id', async (req, res) => {
+  app.get('/images/:id', asyncHandler(async (req, res, next) => {
     const result = await db.get('images', req.params.id) 
     
     if (!result.count) return res.status(404).render('error', {msg: `image ${req.params.id} not found`})
@@ -61,9 +67,9 @@ module.exports = function (cfg) {
       title: doc.title,
       created: new Date(doc.created.toString())
     })
-  })
+  }))
 
-  app.get('/images', async (req, res) => {
+  app.get('/images', asyncHandler(async (req, res, next) => {
     const result = await db.get('images', '*')
     const docs = result.result
 
@@ -74,7 +80,7 @@ module.exports = function (cfg) {
         created: new Date(doc.created.toString())
       }))
     })
-  })
+  }))
 
   const transformImage = (pathToImage, fileName, cb) => {
     gm(pathToImage)
@@ -94,7 +100,7 @@ module.exports = function (cfg) {
     }
 
     console.error(err.stack)
-    res.status(500).send('Unexpected Error occurred.')
+    res.status(500).render('error', {msg: 'Unexpected Error occurred.'})
   })
 
   return app
