@@ -1,24 +1,40 @@
 
-<body>
-  <h1>ImgBox FX</h1>
-  
-  <p>Welcome to ImgBox FX, a place to store your images with special effects.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>ImgBox FX</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
 
-  <h2>Upload an image</h2>
+<body>
+  <div class="container">
+
+  <div class="header">
+    <h1 class="display-1">ImgBox FX</h1>
+    <p class="lead">Welcome to ImgBox FX, a place to store your images with special effects.</p>
+  </div>
+
+
+  <h1 class="upload-image-header">Upload Image</h2>
+  
   <form method="post" action="/images" enctype="multipart/form-data">
-    <div>
+    <div class="form-group">
+        <input type="file" class="form-control-file" id="file" name="pic" required accept="image/*">
+    </div>
+    <div class="form-group">
       <label for="title">Title/description</label>
-      <input type="text" id="title" name="title" required
-        minlength="1" maxlength="100">
+      <input type="text" class="form-control" id="title" name="title" required
+          minlength="1" maxlength="100">
     </div>
-    <div>
-      <label for="file">Choose a file</label>
-      <input type="file" id="file" name="pic" required accept="image/*">
-    </div>
-    <div>
-      <button>Upload the file</button>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Upload the file</button>
     </div>
   </form>
  
   <p>Or, <a href="/images">browse transformed images.</a></p>
+  </div>
 </body>
+</html>
