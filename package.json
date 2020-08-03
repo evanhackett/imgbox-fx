@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "test": "tape tests/*-test.js"
+    "test": "tape tests/*-test.js | tap-spec"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "pug": "^3.0.0",
-    "rocket-store": "^0.10.6"
+    "rocket-store": "^0.10.6",
+    "tap-spec": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.4",

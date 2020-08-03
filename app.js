@@ -24,35 +24,18 @@ module.exports = function (cfg) {
   app.set('views', './views')
   app.set('view engine', 'pug')
 
-
-  const handleError = (err, res) => {
-    console.error('got an error:', err)
-    res.status(500).send('ERROR')
-  }
-
-  const handleGmError = (err, res) => {
-    res.status(400).send('Error attempting to transform image. The chosen file must be a valid image format')
-  }
-
+  const error400 = (msg, res) => res.status(400).send(msg)
 
   app.post('/images', upload.single('pic'), (req, res) => {
-    if (!req.body.title || req.body.title.length < 1) {
-      return res.status(400).send('Title field should be between 1 and 100 characters.')
-    }
-
-    if (!req.file) {
-      return res.status(400).send('Image file must be selected')
-    }
-
-    if (!req.file.mimetype.includes('image')) {
-      return res.status(400).send('The chosen file must be a valid image format')
-    }
+    if (!req.body.title || req.body.title.length < 1) return error400('Title field should be between 1 and 100 characters.', res)
+    if (!req.file) return error400('Image file must be selected', res)
+    if (!req.file.mimetype.includes('image')) return error400('The chosen file must be a valid image format', res)
 
     const uploadedPath = req.file.path
     const fileName = getFileName(uploadedPath)
 
     transformImage(uploadedPath, fileName, async (err) => {
-      if (err) return handleGmError(err, res)
+      if (err) return error400('Error attempting to transform image. The chosen file must be a valid image format', res)
 
       const doc = {
         fileName: fileName,
@@ -69,9 +52,7 @@ module.exports = function (cfg) {
   app.get('/images/:id', async (req, res) => {
     const result = await db.get('images', req.params.id) 
     
-    if (!result.count) {
-      return res.status(404).send(`image ${req.params.id} not found`)
-    }
+    if (!result.count) return res.status(404).send(`image ${req.params.id} not found`)
 
     const doc = result.result[0]
     
@@ -106,20 +87,15 @@ module.exports = function (cfg) {
   // error-handling middleware has to be last, after app.use() and routes calls
   app.use(function (err, req, res, next) {
     if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).send('File is too large. Image file should be less than 10MB.')
-      }
-      if (err.code === 'LIMIT_FIELD_VALUE') {
-        return res.status(400).send('Title field should be between 1 and 100 characters.')
-      }
+      if (err.code === 'LIMIT_FILE_SIZE') return error400('File is too large. Image file should be less than 10MB.', res)
+      if (err.code === 'LIMIT_FIELD_VALUE') return error400('Title field should be between 1 and 100 characters.', res)
       
-      console.log(err)
+      console.error(err)
     }
 
     console.error(err.stack)
     res.status(500).send('Unexpected Error occurred.')
   })
-
 
   return app
 }
