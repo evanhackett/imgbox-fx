@@ -48,7 +48,7 @@ test('GET /images/<valid-id> should respond with image view', t => {
     .expect(200)
     .end((err, res) => {
       if (err) return t.end(err)
-      t.equals(res.text.includes(`<img src="../${id}"`), true)
+      t.equals(res.text.includes(`src="../${id}"`), true) // check if there's an img tag with src set correctly
       t.end()
     })
 })
@@ -59,7 +59,7 @@ test('GET /images should respond with all-images view', t => {
     .expect(200)
     .end((err, res) => {
       if (err) return t.end(err)
-      t.equals(res.text.includes(`<li><a href="images/${id}">${doc.title}`), true)
+      t.equals(res.text.includes(`href="images/${id}">${doc.title}`), true) // should be a link to the previously uploaded image
       t.end()
     })
 })
