@@ -18,6 +18,20 @@ test('GET / should respond with 200', t => {
     .expect(200, t.end)
 })
 
+// This test requires that you delete /tmp/rsdb which is where rocket-store will store files when not configured with a storage dir.
+// If you don't delete /tmp/rsdb, this test may pass when it shouldn't 
+test('GET /images should respond with all-images view even when there are no images uploaded yet', t => {
+  request(app)
+    .get('/images')
+    .expect(200)
+    .end((err, res) => {
+      if (err) return t.end(err)
+      t.equals(res.text.includes('All Transformed Images'), true) // should be a link to the previously uploaded image
+      t.end()
+    })
+})
+
+
 let id;
 let doc;
 

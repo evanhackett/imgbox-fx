@@ -73,12 +73,16 @@ module.exports = function (cfg) {
     const result = await db.get('images', '*')
     const docs = result.result
 
+    const images = docs 
+      ? docs.map(doc => ({
+          url: `images/${doc.fileName}`,
+          title: doc.title,
+          created: new Date(doc.created.toString())
+        })) 
+      : []
+
     res.render('all-images', {
-      images: docs.map(doc => ({
-        url: `images/${doc.fileName}`,
-        title: doc.title,
-        created: new Date(doc.created.toString())
-      }))
+      images: images
     })
   }))
 
