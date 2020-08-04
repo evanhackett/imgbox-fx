@@ -17,4 +17,4 @@ html
       h1= 'Links to All Transformed Images'
       ul.list-group
         each image in images.sort((a,b) => b.created - a.created)
-          a.list-group-item.list-group-item-action(href= image.url)= `${image.title} - ${image.created.toLocaleString()}`
+          a.list-group-item.list-group-item-action(href= image.url)= `${image.title} - ${image.created.toUTCString()}`

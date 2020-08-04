@@ -2,7 +2,7 @@ html
   head
     title= title
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="../styles.css">
   body
     div.container
       <nav class="nav">
@@ -10,6 +10,6 @@ html
         <a class="nav-link" href="/images">Browse All Images</a>
       </nav>
       h1= title
-      p= `Created on ${created.toLocaleString()}`
+      p= `Created on ${created.toUTCString()}`
       img.img-fluid(src= src, alt='transformed image')
 
