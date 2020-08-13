@@ -20,8 +20,6 @@ To run the tests: `npm test`
 
 The web framework is [express](https://expressjs.com/). I find it the best balance between minimalism, community support / available libraries, and overall speed of develoment. App frameworks like Django seemed to be overkill for a project like this. I didn't need an admin panel, user authentication, SQL ORM, etc.
 
-Template files for HTML rendering are in the `views` directory. Static files are served out of the `public` directory.
-
 For handling file uploads I used [multer](https://www.npmjs.com/package/multer). One nice thing about multer is it automatically names the files such that the names aren't likely to conflict with each other.
 
 To apply the graphics effect, I used GraphicsMagick through the [gm](https://www.npmjs.com/package/gm) package. I was originally worried this would be one of the harder parts of the app, but it turned out to be one of the easiest.
@@ -33,6 +31,8 @@ To see all dependencies, check out the [package.json](./package.json) file.
 ## Notes on architecture
 
 The app is a traditional server-rendered app, not using any client-side javascript at all. A lot of my professional experience is building single-page applications with complex frontend frameworks, and I find it is often overkill, so I wanted to try something different. I don't regret this decision at all, I think it made things simpler.
+
+Template files for HTML rendering are in the `views` directory. Static files are served out of the `public` directory.
 
 There is really one main endpoint to make requests to, and that is `/images`. Sending a POST to `/images` is for uploading new images, and sending a GET to `/images` is for retrieving all images.
 
