@@ -58,4 +58,8 @@ Possible errors include:
 
 These are typical concerns, and not unique to this app at all. 
 
+## Deployment
 
+The app was deployed on an Upcloud VPS, using Caddy as a web proxy for easy https.
+
+![](imgbox-v1-architecture.png)
